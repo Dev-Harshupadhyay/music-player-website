@@ -99,6 +99,19 @@
   .track-meta .t-artist{font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .now-badge{font-size:11px; color:var(--accent); font-weight:700; flex-shrink:0;}
   .empty-note{padding:24px 10px; text-align:center; color:var(--text-dim); font-size:13px;}
+  .drawer-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:4px 8px 10px; font-size:12px; color:var(--text-dim); letter-spacing:.4px;
+  }
+  .drawer-header b{color:#fff;}
+
+  .track-details.is-fading, .cover-img.is-fading{opacity:0; transform:translateY(2px);}
+  .track-details, .cover-img{transition:opacity .22s ease, transform .22s ease;}
+
+  .list-count{
+    font-size:10px; background:var(--accent); color:#111; font-weight:800;
+    border-radius:10px; padding:1px 7px; margin-left:6px; vertical-align:2px;
+  }
 
   /* ── Player dock ─────────────────────────── */
   .player-dock{padding:18px 16px 10px;}
@@ -174,6 +187,7 @@
 
   <div class="list-wrap">
     <div class="playlist-drawer" id="drawer">
+      <div class="drawer-header"><b id="drawerLabel">Playlists</b><span id="drawerCount"></span></div>
       <div id="listItems"></div>
     </div>
   </div>
@@ -197,7 +211,7 @@
 
       <div class="controls-group">
         <button class="ctrl-btn" id="prev" title="Previous">⏮</button>
-        <button class="ctrl-btn" id="listBtn" title="Toggle playlist">📂</button>
+        <button class="ctrl-btn" id="listBtn" title="Browse &amp; change songs">📂<span class="list-count" id="listCount"></span></button>
         <button class="ctrl-btn" id="next" title="Next">⏭</button>
       </div>
     </div>
@@ -226,17 +240,52 @@ const SINGLES = [
 
 [...PLAYLISTS, ...SINGLES].forEach(t => t.cover = `https://img.youtube.com/vi/${t.id}/hqdefault.jpg`);
 
+/* ── Ambient backgrounds ─────────────────────────────────────
+   These come from ibb.co share links. ibb.co share pages (ibb.co/CODE)
+   are HTML viewer pages, not raw images, so they can't be used directly
+   as a background — the real file lives at i.ibb.co/CODE/<filename>.
+   Since the filename isn't visible from the share link, we try the most
+   common filenames ibb.co generates and keep whichever one loads. */
+const BG_CODES = ['pSwH5rG', 'xt9cFZG5', '0yb2LYtm', 'nMVLVCVy'];
+const BG_FILENAME_GUESSES = [
+  'image1.jpg', 'image.jpg', 'image1.jpeg', 'image.jpeg',
+  'image1.png', 'image.png', 'image1.webp', 'image.webp',
+];
+const FALLBACK_GRADIENT = 'linear-gradient(160deg,#3a2317,#120c08 70%)';
+
+function resolveBackground(code) {
+  return new Promise(resolve => {
+    let i = 0;
+    const tryNext = () => {
+      if (i >= BG_FILENAME_GUESSES.length) return resolve(null);
+      const url = `https://i.ibb.co/${code}/${BG_FILENAME_GUESSES[i++]}`;
+      const img = new Image();
+      img.onload = () => resolve(url);
+      img.onerror = tryNext;
+      img.src = url;
+    };
+    tryNext();
+  });
+}
+
+let BACKGROUNDS = [];
+Promise.all(BG_CODES.map(resolveBackground)).then(results => {
+  BACKGROUNDS = results.filter(Boolean);
+  renderTrack(); // re-apply now that real backgrounds (if any) are ready
+});
+
 /* ── Shorthand + state ──────────────────────────────────── */
 const $ = id => document.getElementById(id);
 const el = {
   listItems: $('listItems'), drawer: $('drawer'), listBtn: $('listBtn'),
-  cover: $('cover'), title: $('title'), artist: $('artist'),
+  drawerLabel: $('drawerLabel'), drawerCount: $('drawerCount'), listCount: $('listCount'),
+  cover: $('cover'), title: $('title'), artist: $('artist'), trackDetails: document.querySelector('.track-details'),
   play: $('play'), prev: $('prev'), next: $('next'),
   seek: $('seek'), seekFill: $('seekFill'), tCur: $('tCur'), tDur: $('tDur'),
   bgA: $('bgA'), bgB: $('bgB'),
 };
 
-const state = { tab: 'playlists', list: PLAYLISTS, pos: 0, ready: false, playing: false, scrubbing: false };
+const state = { tab: 'playlists', list: PLAYLISTS, pos: 0, ready: false, playing: false, scrubbing: false, bgIndex: 0 };
 let yt = null;
 let bgToggle = false;
 
@@ -248,27 +297,49 @@ const fmt = s => {
 const currentTrack = () => state.list[state.pos];
 
 /* ── Rendering ──────────────────────────────────────────── */
-function renderTrack() {
+function applyBackground() {
+  const showEl = bgToggle ? el.bgB : el.bgA;
+  const hideEl = bgToggle ? el.bgA : el.bgB;
+  if (BACKGROUNDS.length) {
+    showEl.style.backgroundImage = `url('${BACKGROUNDS[state.bgIndex % BACKGROUNDS.length]}')`;
+  } else {
+    showEl.style.backgroundImage = FALLBACK_GRADIENT;
+  }
+  showEl.classList.add('is-active');
+  hideEl.classList.remove('is-active');
+  bgToggle = !bgToggle;
+}
+
+function renderTrack({ animate = true } = {}) {
   const t = currentTrack();
   if (!t) {
     el.title.textContent = 'No track selected';
     el.artist.textContent = 'Pick something from the list';
     return;
   }
-  el.title.textContent = t.title;
-  el.artist.textContent = t.artist;
-  el.cover.src = t.cover;
-  el.cover.alt = t.title;
 
-  // crossfade the ambient backdrop
-  const showEl = bgToggle ? el.bgB : el.bgA;
-  const hideEl = bgToggle ? el.bgA : el.bgB;
-  showEl.style.backgroundImage = `url('${t.cover}')`;
-  showEl.classList.add('is-active');
-  hideEl.classList.remove('is-active');
-  bgToggle = !bgToggle;
+  const paint = () => {
+    el.title.textContent = t.title;
+    el.artist.textContent = t.artist;
+    el.cover.src = t.cover;
+    el.cover.alt = t.title;
+    el.trackDetails.classList.remove('is-fading');
+    el.cover.classList.remove('is-fading');
+  };
+
+  if (animate) {
+    el.trackDetails.classList.add('is-fading');
+    el.cover.classList.add('is-fading');
+    setTimeout(paint, 180);
+  } else {
+    paint();
+  }
+
+  // playlist/song change → rotate to the next curated backdrop
+  applyBackground();
 
   [...el.listItems.children].forEach((row, i) => row.classList.toggle('is-current', i === state.pos));
+  el.listItems.querySelectorAll('.now-badge').forEach((b, i) => (b.textContent = i === state.pos ? '▶ Playing' : ''));
 }
 
 function renderList() {
@@ -290,7 +361,10 @@ function renderList() {
     row.addEventListener('click', () => playAt(i));
     el.listItems.append(row);
   });
-  renderTrack();
+  el.drawerLabel.textContent = state.tab === 'playlists' ? 'Playlists' : 'Single Songs';
+  el.drawerCount.textContent = `${state.list.length} tracks`;
+  el.listCount.textContent = state.list.length;
+  renderTrack({ animate: false });
 }
 
 function renderPlaying(on) {
@@ -306,6 +380,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     state.tab = btn.dataset.tab;
     state.list = state.tab === 'playlists' ? PLAYLISTS : SINGLES;
     state.pos = 0;
+    state.bgIndex++;
     renderList();
   });
 });
@@ -320,6 +395,7 @@ el.listBtn.addEventListener('click', () => {
 /* ── Playback ───────────────────────────────────────────── */
 function playAt(i) {
   state.pos = i;
+  state.bgIndex++;
   renderTrack();
   if (!yt || !state.ready) return;
   yt.loadVideoById(currentTrack().id);
