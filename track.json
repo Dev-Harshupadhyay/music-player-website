@@ -32,6 +32,19 @@
     { "id": "ieu6xnwJxdA", "title": "किताबें बहुत सी | | Baazigar | Shah Rukh Khan & Kajol | Asha Bhosle | Vinod Rathod Romantic Songs", "artist": "Ishtar Music" },
     { "id": "thjRNwjmAdQ", "title": "Tumse Milne Ki Tamanna Hai - Lyrical | Saajan | Salman Khan & Madhuri | 90's Evergreen Hindi Songs", "artist": "Ishtar Music" }
   ],
+  "BHAKTI": [
+    { "id": "29lcfY2MN98", "title": "अलग अलग रूप में माई -Pawan Singh ~ Bhojpuri Mata Bhajan // माता का हिट भोजपुरी भजन", "artist": "Bhakti Geet - Wave Music" },
+    { "id": "Nz5hrfyzacA", "title": "पवन सिंह का टॉप 20 सुपरहिट देवी गीत माता भजन | Pawan Singh Super Hit Durga Mata Bhajans - Jukebox", "artist": "Wave - Sadabahar Hits" },
+    { "id": "W32F4S2ZkKI", "title": "पवन सिंह हिट्स - Pawan Singh Devi Geet Hits Vol-1 || Video Jukebox || Bhojpuri Devi Geet", "artist": "Wave Music Bhakti " },
+    { "id": "LOeipKXa6gc", "title": "Pawan Singh का दर्दभरा देवी गीत विदाई गीत Chhodi Ke Jani Jaihe Bhojpuri Sad Devi Geet2026", "artist": "Wave Bhakti Special" },
+    { "id": "cphHU8UfwNE", "title": "आंख से आंसू आ जायेगा इस गाने को सुनने पर- Pawan Singh Bidai Geet- Hamani Ke Chhodi ke Nagariya", "artist": "Bhojpuri Bhakti Live" }
+  ],
+  "BHOJPURI": [
+    { "id": "oQM4pg4EOGY", "title": "#Video - नया बा मशीन | #Pawan Singh | Ft. #Ishani Ghosh | Naya Ba Machine | New #Bhojpuri Song 2025", "artist": "Share Bhojpuri" },
+    { "id": "B7t35oWkAQg", "title": "मीठा मीठा बथे कमरिया हो | #PAWAN SINGH | 4K #VIDEO #DIMPAL SINGH | Mitha Mitha Bathe Kamariya Ho", "artist": "Worldwide Records Bhojpuri" },
+    { "id": "b4keo972JYs", "title": "Mehar Wala Feel | मेहर वाला फ़ील | Shilpi Raj New Song | Pradeep Prabhash | New Bhojpuri Song", "artist": "Saregama Hum Bhojpuri" },
+    { "id": "c4JD7rEtIj8", "title": "#Chhalakata Hamro Jawaniya - #pawansingh ,#Kajal Raghwani, #priyanka singh @WorldwideRecordsBhojpuri", "artist": "Worldwide Records Bhojpuri" }
+  ],
   "BACKGROUNDS": [
     { "url": "https://i.ibb.co/pSwH5rG/image1.jpg", "tint": "hue-rotate(0deg) saturate(1)" },
     { "url": "https://i.ibb.co/xt9cFZG5/image2.jpg", "tint": "hue-rotate(15deg) saturate(1.1)" },
