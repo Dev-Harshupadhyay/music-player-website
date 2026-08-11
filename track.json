@@ -1,0 +1,22 @@
+{
+  "PLAYLISTS": [
+    { "id": "NlWmLCZM7gA", "title": "90s Love & Hindi Songs", "artist": "Various Artists" },
+    { "id": "7obFFUPv4Hs", "title": "Kumar Sanu Hit Songs", "artist": "Kumar Sanu" },
+    { "id": "ebw1zHtleFY", "title": "Kishore Kumar Hits", "artist": "Kishore Kumar" },
+    { "id": "SI3cjQISDqs", "title": "90s Superhit Songs", "artist": "Various Artists" }
+  ],
+  "SINGLES": [
+    { "id": "HpLIPK48a-c", "title": "Saagar Jaisi Aankhon Wali", "artist": "Kishore Kumar" },
+    { "id": "R2m3FN_UEUk", "title": "Ab Tere Dil Mein Hum Aa Gaye", "artist": "Kumar Sanu & Alka Yagnik" },
+    { "id": "9b0iydtDZLU", "title": "Waada Raha Sanam", "artist": "Abhijeet & Alka Yagnik" },
+    { "id": "78CN-Fx7oNo", "title": "Mauka Milega To Hum Bata Denge", "artist": "Udit Narayan & Alka Yagnik" },
+    { "id": "GXYucMSjkzU", "title": "Kahin Mujhe Pyar Hua Toh Nahi", "artist": "Kumar Sanu & Alka Yagnik" }
+  ],
+  "BACKGROUNDS": [
+    { "url": "https://i.ibb.co/pSwH5rG/image1.jpg", "tint": "hue-rotate(0deg) saturate(1)" },
+    { "url": "https://i.ibb.co/xt9cFZG5/image2.jpg", "tint": "hue-rotate(15deg) saturate(1.1)" },
+    { "url": "https://i.ibb.co/0yb2LYtm/image3.jpg", "tint": "hue-rotate(-15deg) saturate(0.95)" },
+    { "url": "https://i.ibb.co/nMVLVCVy/image4.jpg", "tint": "hue-rotate(30deg) saturate(1.05)" }
+  ]
+}
+
