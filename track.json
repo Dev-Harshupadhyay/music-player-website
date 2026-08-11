@@ -10,7 +10,27 @@
     { "id": "R2m3FN_UEUk", "title": "Ab Tere Dil Mein Hum Aa Gaye", "artist": "Kumar Sanu & Alka Yagnik" },
     { "id": "9b0iydtDZLU", "title": "Waada Raha Sanam", "artist": "Abhijeet & Alka Yagnik" },
     { "id": "78CN-Fx7oNo", "title": "Mauka Milega To Hum Bata Denge", "artist": "Udit Narayan & Alka Yagnik" },
-    { "id": "GXYucMSjkzU", "title": "Kahin Mujhe Pyar Hua Toh Nahi", "artist": "Kumar Sanu & Alka Yagnik" }
+    { "id": "GXYucMSjkzU", "title": "Kahin Mujhe Pyar Hua Toh Nahi", "artist": "Kumar Sanu & Alka Yagnik" },
+    { "id": "E9Y45BncXLA", "title": "Chand Se Parda Kijiye", "artist": "The Kumar Sanu Official" },
+    { "id": "52MTK4354ck", "title": "Kisi Din Banoongi Main", "artist": "Alka Yagnik" },
+    { "id": "coZoSYJU1OY", "title": "Tujhe Na Dekhu Toh | Kumar Sanu | Alka Yagnik | Rang | 1993", "artist": "90's Gaane" },
+    { "id": "KeyfUuXPOcY", "title": "Dheere Dheere Se Meri Zindagi Mein Aana (Full Song) | Aashiqui | Rahul Roy, Anu Agarwal | T-Series", "artist": "T-Series" },
+    { "id": "QSFWw0O3Hzk", "title": "Ek Tere Hi Chehre Pe Pyar Aaya", "artist": "Anuradha Paudwal Official" },
+    { "id": "PqiddY3o3aY", "title": "Dil Kehta Hai | Akele Hum Akele Tum | Kumar Sanu, Alka Yagnik | Aamir Khan | 90s Love Song", "artist": "Ishtar Music" },
+    { "id": "5EZagydXjNU", "title": "Ek Sanam Chahiye Aashiqui Ke Liye", "artist": "The Kumar Sanu Official" },
+    { "id": "iSUK1QoK9-E", "title": "Pehla Nasha - Lyrical | Aamir Khan | Sadhana Sargam | Udit Narayan | Valentine's Day Love Song", "artist": "Saregama Music" },
+    { "id": "dDR4oiyjUBA", "title": "Raah Mein Unse Mulaqat - Lyrical | Ajay Devgn, Tabu | Kumar Sanu, Alka Yagnik |Vijaypath | Anu Malik", "artist": "Tips Official" },
+    { "id": "kzTWRX9Dhrg", "title": "Chalte Chalte | Full Song | Mohabbatein | Shah Rukh Khan, Uday Chopra, Jugal Hansraj, Jimmy Shergill", "artist": "YRF" },
+    { "id": "waTwDgK2tkk", "title": "Tu Hi Re (Music Video) | A. R. Rahman | Bombay Movie | Hariharan, Kavita K | Bollywood Hindi Song", "artist": "Universal Music India" },
+    { "id": "_okskYynYPc", "title": "Hum Tere Bin Kahin Reh Nahin Paate", "artist": "Anuradha Paudwal Official" },
+    { "id": "5eyflIV8pzM", "title": "O Mere Dil Ke Chain | Kishore Kumar | Rajesh Khanna | R.D Burman | Old Hindi Song | Old Is Gold", "artist": "Saregama Music" },
+    { "id": "BplOYQpyXZA", "title": "Saathiya Tune Kya Kiya - Full Lyrical Video Song| Love |Salman Khan, Revathi | Romantic Monsoon Song", "artist": "Ishtar Music" },
+    { "id": "MvcNeQlqtes", "title": "Dil Ne Ye Kaha Hai Dil Se - Video Song | Dhadkan | #AkshayKumar, #SunielShetty & #ShilpaShetty", "artist": "Ishtar Music" },
+    { "id": "hZuwe72Rtcc", "title": "Hoshwalon Ko Khabar Kya | Aamir Khan | Sonali Bendre | Sarfarosh Movie | Jagjit Singh | 90's Hits", "artist": "Tips Official" },
+    { "id": "ZfRkbW0qJKs", "title": "Kya Khoob Lagti Ho Lyrical | क्या खूब लगती हो | Mukesh | Kanchan | Dharmatma | Hema Malini | Feroz", "artist": "Best of Mukesh" },
+    { "id": "oEg_iXEWlt4", "title": "Lyrical : Tu Meri Zindagi Hai | Aashiqui | Anuradha Paudwal, Kumar Sanu |Rahul Roy, Anu Agarwal", "artist": "T-Series Bollywood Classics" },
+    { "id": "ieu6xnwJxdA", "title": "किताबें बहुत सी | | Baazigar | Shah Rukh Khan & Kajol | Asha Bhosle | Vinod Rathod Romantic Songs", "artist": "Ishtar Music" },
+    { "id": "thjRNwjmAdQ", "title": "Tumse Milne Ki Tamanna Hai - Lyrical | Saajan | Salman Khan & Madhuri | 90's Evergreen Hindi Songs", "artist": "Ishtar Music" }
   ],
   "BACKGROUNDS": [
     { "url": "https://i.ibb.co/pSwH5rG/image1.jpg", "tint": "hue-rotate(0deg) saturate(1)" },
@@ -19,4 +39,3 @@
     { "url": "https://i.ibb.co/nMVLVCVy/image4.jpg", "tint": "hue-rotate(30deg) saturate(1.05)" }
   ]
 }
-
