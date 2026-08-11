@@ -3,168 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Purani Yaadein — Music Player</title>
+<title>पुरानी यादें — Music Player</title>
 <style>
   :root{
     --accent:#ff9800;
-    --accent-2:#ffb74d;
-    --glass:rgba(24,24,24,0.72);
-    --glass-strong:rgba(18,18,18,0.88);
-    --border:rgba(255,255,255,0.10);
-    --text-dim:#b3b3b3;
+    --glass:rgba(24,24,24,0.68);
+    --glass-strong:rgba(16,14,13,0.82);
+    --border:rgba(255,255,255,0.12);
+    --text-dim:#cfc9c3;
+    --bg-base:#151008;
+    --text-color:#fff;
+    --footer-bg:rgba(0,0,0,.5);
   }
+
+  body.dark-mode {
+    --accent:#00e5ff;
+    --glass:rgba(15,23,42,0.75);
+    --glass-strong:rgba(10,15,30,0.88);
+    --border:rgba(255,255,255,0.08);
+    --text-dim:#94a3b8;
+    --bg-base:#090d16;
+    --text-color:#f8fafc;
+    --footer-bg:rgba(10,15,30,0.6);
+  }
+
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
   html,body{height:100%;}
   body{
-    background:#0c0c0e;
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height:100vh;
-    overflow-x:hidden;
-    position:relative;
+    color:var(--text-color);
+    display:flex; flex-direction:column; align-items:center;
+    min-height:100vh; overflow-x:hidden; position:relative;
+    background:var(--bg-base);
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
-  /* Ambient blurred backdrop, driven by the current cover art */
+  /* ── Rotating illustrated backdrop ─────────────────────── */
   .bg-layer{
     position:fixed; inset:0;
-    background-size:cover;
-    background-position:center;
-    filter:blur(38px) saturate(120%) brightness(0.45);
-    transform:scale(1.15);
-    transition:opacity 1.1s ease;
-    opacity:0;
-    z-index:0;
+    background-size:cover; background-position:center;
+    transition:opacity 1.2s ease, filter 1.2s ease;
+    opacity:0; z-index:0;
   }
   .bg-layer.is-active{opacity:1;}
   body::after{
-    content:'';
-    position:fixed; inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.75) 60%, rgba(0,0,0,0.92));
-    z-index:0;
+    content:''; position:fixed; inset:0; z-index:1;
+    background:linear-gradient(180deg, rgba(10,7,5,.45), rgba(10,7,5,.72) 55%, rgba(6,4,3,.92));
+    transition: background 0.3s ease;
+  }
+  body.dark-mode::after{
+    background:linear-gradient(180deg, rgba(5,7,15,.55), rgba(5,7,15,.82) 55%, rgba(2,4,8,.95));
   }
 
-  header, main, .player-dock, footer{position:relative; z-index:5; width:100%; display:flex; justify-content:center;}
+  header, .status-row, main, .list-wrap, .player-dock, footer{position:relative; z-index:5; width:100%; display:flex; justify-content:center;}
 
-  /* ── Top nav ─────────────────────────────── */
-  header{padding:22px 16px 8px;}
-  .tabs{
-    display:flex; gap:10px;
-    background:var(--glass);
-    padding:6px; border-radius:30px;
-    backdrop-filter:blur(14px);
-    border:1px solid var(--border);
+  /* ── Status row (clock / night-mode / icons) ───────────── */
+  .status-row{padding:18px 20px 0; justify-content:space-between; max-width:560px; margin:0 auto;}
+  .status-left{display:flex; align-items:center; gap:10px;}
+  .clock{font-size:26px; font-weight:800; letter-spacing:.5px;}
+  .icon-pill{
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(255,255,255,.08); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; cursor:pointer; transition:background .2s;
   }
-  .tab-btn{
-    padding:10px 26px; font-size:14px; font-weight:700;
-    border:none; border-radius:24px; cursor:pointer;
-    background:transparent; color:var(--text-dim);
-    transition:all .25s ease; letter-spacing:.3px;
-  }
-  .tab-btn.active{
-    background:var(--accent); color:#111;
-    box-shadow:0 6px 18px rgba(255,152,0,.4);
-  }
+  .icon-pill:hover{background:rgba(255,255,255,.16);}
+  .icon-pill.is-on{background:var(--accent); color:#111;}
+  .status-right{display:flex; align-items:center; gap:10px;}
 
-  /* ── Hero ────────────────────────────────── */
-  .hero{flex-direction:column; align-items:center; text-align:center; padding:28px 20px 10px;}
+  /* ── Live listeners ─────────────────────────────────────── */
+  .live-row{padding:10px 20px 0; justify-content:center;}
+  .live-pill{
+    display:flex; align-items:center; gap:8px;
+    font-size:14px; color:var(--text-dim); font-weight:600;
+  }
+  .live-dot{width:9px; height:9px; border-radius:50%; background:#3ddc73; box-shadow:0 0 8px #3ddc73; flex-shrink:0;}
+
+  /* ── Hero ────────────────────────────────────────────────── */
+  .hero{flex-direction:column; align-items:center; text-align:center; padding:18px 20px 6px;}
   .hero h1{
-    font-size:clamp(30px,7vw,52px); font-weight:900;
-    text-shadow:0 4px 22px rgba(0,0,0,.85);
-    letter-spacing:.5px;
+    font-size:clamp(34px,9vw,58px); font-weight:900;
+    text-shadow:0 6px 24px rgba(0,0,0,.9);
+    letter-spacing:.5px; line-height:1.1;
   }
-  .hero p{margin-top:8px; color:var(--text-dim); font-size:14px; letter-spacing:.4px;}
 
-  /* ── Track list ──────────────────────────── */
-  .list-wrap{width:100%; max-width:560px; padding:14px 16px 0; flex-direction:column;}
+  /* ── Tabs ───────────────────────────────────────────────── */
+  .tabs{display:flex; gap:8px; margin-top:16px; background:var(--glass); padding:6px; border-radius:30px; backdrop-filter:blur(14px); border:1px solid var(--border); transition:background 0.3s ease;}
+  .tab-btn{padding:9px 22px; font-size:13px; font-weight:700; border:none; border-radius:22px; cursor:pointer; background:transparent; color:var(--text-dim); transition:all .25s ease;}
+  .tab-btn.active{background:var(--accent); color:#111; box-shadow:0 6px 16px rgba(255,152,0,.4);}
+
+  /* ── Track list (glass card, pill highlight) ───────────── */
+  .list-wrap{max-width:560px; padding:16px 16px 0; flex-direction:column;}
   .playlist-drawer{
-    background:var(--glass); backdrop-filter:blur(16px);
-    border:1px solid var(--border); border-radius:22px;
+    background:var(--glass); backdrop-filter:blur(18px);
+    border:1px solid var(--border); border-radius:24px;
     width:100%; max-height:0; overflow:hidden;
-    transition:max-height .45s ease, padding .45s ease, opacity .3s ease;
+    transition:max-height .45s ease, padding .45s ease, opacity .3s ease, background 0.3s ease;
     opacity:0; padding:0 6px;
   }
-  .playlist-drawer.is-open{max-height:420px; overflow-y:auto; padding:10px; opacity:1;}
+  .playlist-drawer.is-open{max-height:380px; overflow-y:auto; padding:8px; opacity:1;}
   .track-row{
-    display:flex; align-items:center; gap:12px;
-    padding:10px 10px; border-radius:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:13px 16px; border-radius:16px; cursor:pointer;
     transition:background .2s ease;
   }
   .track-row:hover{background:rgba(255,255,255,.06);}
-  .track-row.is-current{background:rgba(255,152,0,.22);}
-  .track-row img{width:44px; height:44px; border-radius:10px; object-fit:cover; flex-shrink:0;}
-  .track-meta{display:flex; flex-direction:column; overflow:hidden; text-align:left; flex-grow:1;}
-  .track-meta .t-title{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .track-meta .t-artist{font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .now-badge{font-size:11px; color:var(--accent); font-weight:700; flex-shrink:0;}
-  .empty-note{padding:24px 10px; text-align:center; color:var(--text-dim); font-size:13px;}
-  .drawer-header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:4px 8px 10px; font-size:12px; color:var(--text-dim); letter-spacing:.4px;
+  .track-row.is-current{background:rgba(255,255,255,.14); box-shadow:inset 0 0 0 1px var(--accent);}
+  .t-title{font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1 1 auto;}
+  .t-artist{font-size:12.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:0 0 auto; max-width:42%; text-align:right;}
+  .track-row.is-current .t-title, .track-row.is-current .t-artist{color:var(--text-color);}
+
+  /* ── Sticky bottom player ───────────────────────────────── */
+  .player-dock{padding:16px 16px 10px; margin-top:14px;}
+  .player-card{
+    background:var(--glass-strong); backdrop-filter:blur(20px);
+    border:1px solid var(--border); border-radius:32px;
+    width:100%; max-width:560px; padding:16px 20px 18px;
+    box-shadow:0 18px 44px rgba(0,0,0,.65);
+    display:flex; flex-direction:column; gap:12px;
+    transition: background 0.3s ease;
   }
-  .drawer-header b{color:#fff;}
+  .now-playing-row{display:flex; align-items:center; gap:14px;}
+  .cover-wrap{width:58px; height:58px; border-radius:50%; flex-shrink:0; overflow:hidden; border:2px solid rgba(255,255,255,.25); box-shadow:0 6px 16px rgba(0,0,0,.5);}
+  .cover-img{width:100%; height:100%; object-fit:cover; display:block;}
+  .track-details{flex:1 1 auto; overflow:hidden; text-align:left;}
+  .marquee{overflow:hidden; white-space:nowrap; position:relative;}
+  .marquee-inner{display:inline-block; white-space:nowrap;}
+  .marquee.is-scrolling .marquee-inner{animation:scrollText 9s linear infinite;}
+  @keyframes scrollText{0%,15%{transform:translateX(0);}85%,100%{transform:translateX(calc(-100% + 220px));}}
+  .track-details h4{font-size:15px; font-weight:700;}
+  .track-details p{font-size:12px; color:var(--text-dim); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
   .track-details.is-fading, .cover-img.is-fading{opacity:0; transform:translateY(2px);}
   .track-details, .cover-img{transition:opacity .22s ease, transform .22s ease;}
 
-  .list-count{
-    font-size:10px; background:var(--accent); color:#111; font-weight:800;
-    border-radius:10px; padding:1px 7px; margin-left:6px; vertical-align:2px;
-  }
-
-  /* ── Player dock ─────────────────────────── */
-  .player-dock{padding:18px 16px 10px;}
-  .player-card{
-    background:var(--glass-strong); backdrop-filter:blur(18px);
-    border:1px solid var(--border); border-radius:30px;
-    width:100%; max-width:560px;
-    padding:14px 18px 16px;
-    box-shadow:0 16px 40px rgba(0,0,0,.6);
-    display:flex; flex-direction:column; gap:10px;
-  }
-  .now-playing-row{display:flex; align-items:center; gap:14px;}
-  .cover-img{width:56px; height:56px; border-radius:14px; object-fit:cover; background:#222; flex-shrink:0;}
-  .track-details{flex-grow:1; overflow:hidden; text-align:left;}
-  .track-details h4{font-size:15px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .track-details p{font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;}
-
   .seek-row{display:flex; align-items:center; gap:8px;}
-  .seek-time{font-size:11px; color:var(--text-dim); min-width:34px;}
+  .seek-time{font-size:11px; color:var(--text-dim); min-width:32px;}
   .seek-time.dur{text-align:right;}
-  .seek-track{
-    flex-grow:1; height:5px; border-radius:4px; background:rgba(255,255,255,.15);
-    position:relative; cursor:pointer;
-  }
+  .seek-track{flex-grow:1; height:5px; border-radius:4px; background:rgba(255,255,255,.18); position:relative; cursor:pointer;}
   .seek-fill{position:absolute; inset:0; width:0%; background:var(--accent); border-radius:4px; transition:width .15s linear;}
 
-  .controls-group{display:flex; align-items:center; justify-content:center; gap:18px;}
-  .ctrl-btn{
-    background:none; border:none; color:#fff; font-size:20px; cursor:pointer;
-    padding:6px; opacity:.85; transition:opacity .2s, transform .2s;
-  }
+  .controls-group{display:flex; align-items:center; justify-content:space-between; padding:0 4px;}
+  .ctrl-btn{background:none; border:none; color:var(--text-color); font-size:19px; cursor:pointer; padding:6px; opacity:.85; transition:opacity .2s, transform .2s;}
   .ctrl-btn:hover{opacity:1; transform:scale(1.08);}
   .ctrl-btn.is-on{color:var(--accent); opacity:1;}
   .play-btn{
-    background:#fff; color:#000; width:48px; height:48px; border-radius:50%;
+    background:var(--text-color); color:var(--bg-base); width:54px; height:54px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    font-size:19px; border:none; cursor:pointer; flex-shrink:0;
-    transition:transform .15s ease;
+    font-size:21px; border:none; cursor:pointer; flex-shrink:0;
+    box-shadow:0 8px 20px rgba(0,0,0,.4);
+    transition:transform .15s ease, background 0.3s ease, color 0.3s ease;
   }
   .play-btn:hover{transform:scale(1.06);}
   .play-btn:disabled{opacity:.5; cursor:wait;}
+  .queue-btn{position:relative;}
+  .list-count{position:absolute; top:-2px; right:-2px; font-size:9px; background:var(--accent); color:#111; font-weight:800; border-radius:9px; padding:1px 5px;}
 
-  footer{padding:14px; margin-bottom:6px;}
-  footer span{
-    font-size:12px; color:var(--text-dim); background:rgba(0,0,0,.55);
-    padding:6px 18px; border-radius:20px; letter-spacing:1px; backdrop-filter:blur(6px);
-  }
+  footer{padding:8px; margin-bottom:14px;}
+  footer a{text-decoration:none;}
+  footer span{font-size:12px; color:var(--text-dim); background:var(--footer-bg); padding:6px 18px; border-radius:20px; letter-spacing:1px; backdrop-filter:blur(6px); display:inline-block; transition:color 0.2s;}
+  footer a:hover span{color:var(--text-color); background:rgba(255,255,255,0.15);}
 
   #yt-player-holder{position:fixed; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;}
 
-  @media (max-width:480px){
-    .tab-btn{padding:9px 18px; font-size:13px;}
-    .cover-img{width:48px; height:48px;}
+  @media (max-width:420px){
+    .clock{font-size:22px;}
+    .hero h1{font-size:clamp(28px,10vw,44px);}
   }
 </style>
 </head>
@@ -173,21 +176,31 @@
   <div class="bg-layer" id="bgA"></div>
   <div class="bg-layer" id="bgB"></div>
 
-  <header>
+  <div class="status-row">
+    <div class="status-left">
+      <span class="clock" id="clock">--:--</span>
+      <button class="icon-pill" id="nightBtn" title="Night mode">🌙</button>
+    </div>
+    <div class="status-right">
+      <button class="icon-pill" id="repeatBtn" title="Repeat">🔁</button>
+      <button class="icon-pill" id="ytBtn" title="Open on YouTube">▶</button>
+    </div>
+  </div>
+
+  <div class="live-row">
+    <div class="live-pill"><span class="live-dot"></span><span id="liveCount">27</span>&nbsp;सुन रहे हैं</div>
+  </div>
+
+  <main class="hero">
+    <h1>पुरानी यादें</h1>
     <div class="tabs">
       <button class="tab-btn active" data-tab="playlists">Playlists</button>
       <button class="tab-btn" data-tab="singles">Single Songs</button>
     </div>
-  </header>
-
-  <main class="hero">
-    <h1>पुरानी यादें</h1>
-    <p>Bollywood classics, streamed straight from YouTube</p>
   </main>
 
   <div class="list-wrap">
     <div class="playlist-drawer" id="drawer">
-      <div class="drawer-header"><b id="drawerLabel">Playlists</b><span id="drawerCount"></span></div>
       <div id="listItems"></div>
     </div>
   </div>
@@ -195,12 +208,11 @@
   <div class="player-dock">
     <div class="player-card">
       <div class="now-playing-row">
-        <img id="cover" class="cover-img" src="" alt="Cover art">
+        <div class="cover-wrap"><img id="cover" class="cover-img" src="" alt="Cover art"></div>
         <div class="track-details">
-          <h4 id="title">Loading…</h4>
+          <div class="marquee" id="titleMarquee"><h4 class="marquee-inner" id="title">Loading…</h4></div>
           <p id="artist">Pick a track to start</p>
         </div>
-        <button class="play-btn" id="play" disabled>▶</button>
       </div>
 
       <div class="seek-row">
@@ -210,82 +222,61 @@
       </div>
 
       <div class="controls-group">
+        <button class="ctrl-btn" id="shuffle" title="Shuffle">🔀</button>
         <button class="ctrl-btn" id="prev" title="Previous">⏮</button>
-        <button class="ctrl-btn" id="listBtn" title="Browse &amp; change songs">📂<span class="list-count" id="listCount"></span></button>
+        <button class="play-btn" id="play" disabled>▶</button>
         <button class="ctrl-btn" id="next" title="Next">⏭</button>
+        <button class="ctrl-btn queue-btn" id="listBtn" title="Browse &amp; change songs">☰<span class="list-count" id="listCount"></span></button>
       </div>
     </div>
   </div>
 
-  <footer><span>Made by Harsh</span></footer>
+  <footer>
+    <a href="https://new-profotilo-flame.vercel.app/" target="_blank"><span>Made by Harsh</span></a>
+  </footer>
 
   <div id="yt-player-holder"><div id="yt-player"></div></div>
 
 <script>
-/* ── Track data ─────────────────────────────────────────── */
-const PLAYLISTS = [
-  { id: "NlWmLCZM7gA", title: "90s Love & Hindi Songs", artist: "Various Artists" },
-  { id: "7obFFUPv4Hs", title: "Kumar Sanu Hit Songs", artist: "Kumar Sanu" },
-  { id: "ebw1zHtleFY", title: "Kishore Kumar Hits", artist: "Kishore Kumar" },
-  { id: "SI3cjQISDqs", title: "90s Superhit Songs", artist: "Various Artists" },
-];
+let PLAYLISTS = [];
+let SINGLES = [];
+let BACKGROUNDS = [];
 
-const SINGLES = [
-  { id: "HpLIPK48a-c", title: "Saagar Jaisi Aankhon Wali", artist: "Kishore Kumar" },
-  { id: "R2m3FN_UEUk", title: "Ab Tere Dil Mein Hum Aa Gaye", artist: "Kumar Sanu & Alka Yagnik" },
-  { id: "9b0iydtDZLU", title: "Waada Raha Sanam", artist: "Abhijeet & Alka Yagnik" },
-  { id: "78CN-Fx7oNo", title: "Mauka Milega To Hum Bata Denge", artist: "Udit Narayan & Alka Yagnik" },
-  { id: "GXYucMSjkzU", title: "Kahin Mujhe Pyar Hua Toh Nahi", artist: "Kumar Sanu & Alka Yagnik" },
-];
+/* ── Fetch track.json data dynamically ────────────────────── */
+async function loadTrackData() {
+  try {
+    const res = await fetch('track.json');
+    const data = await res.json();
+    PLAYLISTS = data.PLAYLISTS;
+    SINGLES = data.SINGLES;
+    BACKGROUNDS = data.BACKGROUNDS;
 
-[...PLAYLISTS, ...SINGLES].forEach(t => t.cover = `https://img.youtube.com/vi/${t.id}/hqdefault.jpg`);
-
-/* ── Ambient backgrounds ─────────────────────────────────────
-   These come from ibb.co share links. ibb.co share pages (ibb.co/CODE)
-   are HTML viewer pages, not raw images, so they can't be used directly
-   as a background — the real file lives at i.ibb.co/CODE/<filename>.
-   Since the filename isn't visible from the share link, we try the most
-   common filenames ibb.co generates and keep whichever one loads. */
-const BG_CODES = ['pSwH5rG', 'xt9cFZG5', '0yb2LYtm', 'nMVLVCVy'];
-const BG_FILENAME_GUESSES = [
-  'image1.jpg', 'image.jpg', 'image1.jpeg', 'image.jpeg',
-  'image1.png', 'image.png', 'image1.webp', 'image.webp',
-];
-const FALLBACK_GRADIENT = 'linear-gradient(160deg,#3a2317,#120c08 70%)';
-
-function resolveBackground(code) {
-  return new Promise(resolve => {
-    let i = 0;
-    const tryNext = () => {
-      if (i >= BG_FILENAME_GUESSES.length) return resolve(null);
-      const url = `https://i.ibb.co/${code}/${BG_FILENAME_GUESSES[i++]}`;
-      const img = new Image();
-      img.onload = () => resolve(url);
-      img.onerror = tryNext;
-      img.src = url;
-    };
-    tryNext();
-  });
+    [...PLAYLISTS, ...SINGLES].forEach(t => t.cover = `https://img.youtube.com/vi/${t.id}/hqdefault.jpg`);
+    
+    state.list = PLAYLISTS;
+    state.order = buildOrder();
+    renderList();
+  } catch (err) {
+    console.error('Failed to load track.json', err);
+  }
 }
 
-let BACKGROUNDS = [];
-Promise.all(BG_CODES.map(resolveBackground)).then(results => {
-  BACKGROUNDS = results.filter(Boolean);
-  renderTrack(); // re-apply now that real backgrounds (if any) are ready
-});
-
-/* ── Shorthand + state ──────────────────────────────────── */
+/* ── Shorthand + state ────────────────────────────────────── */
 const $ = id => document.getElementById(id);
 const el = {
-  listItems: $('listItems'), drawer: $('drawer'), listBtn: $('listBtn'),
-  drawerLabel: $('drawerLabel'), drawerCount: $('drawerCount'), listCount: $('listCount'),
-  cover: $('cover'), title: $('title'), artist: $('artist'), trackDetails: document.querySelector('.track-details'),
-  play: $('play'), prev: $('prev'), next: $('next'),
+  listItems: $('listItems'), drawer: $('drawer'), listBtn: $('listBtn'), listCount: $('listCount'),
+  cover: $('cover'), title: $('title'), artist: $('artist'),
+  trackDetails: document.querySelector('.track-details'), titleMarquee: $('titleMarquee'),
+  play: $('play'), prev: $('prev'), next: $('next'), shuffleBtn: $('shuffle'),
   seek: $('seek'), seekFill: $('seekFill'), tCur: $('tCur'), tDur: $('tDur'),
-  bgA: $('bgA'), bgB: $('bgB'),
+  bgA: $('bgA'), bgB: $('bgB'), clock: $('clock'), liveCount: $('liveCount'),
+  nightBtn: $('nightBtn'), repeatBtn: $('repeatBtn'), ytBtn: $('ytBtn'),
 };
 
-const state = { tab: 'playlists', list: PLAYLISTS, pos: 0, ready: false, playing: false, scrubbing: false, bgIndex: 0 };
+const state = {
+  tab: 'playlists', list: [], order: [], pos: 0,
+  ready: false, playing: false, scrubbing: false, bgIndex: 0, shuffleOn: false, repeatOn: false,
+};
 let yt = null;
 let bgToggle = false;
 
@@ -294,29 +285,44 @@ const fmt = s => {
   return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 };
 
-const currentTrack = () => state.list[state.pos];
+function shuffleArr(arr){
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function buildOrder(){ return Array.from({length: state.list.length}, (_, i) => i); }
+const currentTrack = () => state.list[state.order[state.pos]];
 
-/* ── Rendering ──────────────────────────────────────────── */
-function applyBackground() {
+/* ── Ambient backdrop linked to song index ────────────────── */
+function applyBackground(){
+  if (!BACKGROUNDS.length) return;
+  const bg = BACKGROUNDS[state.pos % BACKGROUNDS.length];
   const showEl = bgToggle ? el.bgB : el.bgA;
   const hideEl = bgToggle ? el.bgA : el.bgB;
-  if (BACKGROUNDS.length) {
-    showEl.style.backgroundImage = `url('${BACKGROUNDS[state.bgIndex % BACKGROUNDS.length]}')`;
-  } else {
-    showEl.style.backgroundImage = FALLBACK_GRADIENT;
-  }
+  showEl.style.backgroundImage = `url('${bg.url}')`;
+  showEl.style.filter = bg.tint;
   showEl.classList.add('is-active');
   hideEl.classList.remove('is-active');
   bgToggle = !bgToggle;
 }
 
+/* ── Marquee (only animates if text overflows) ───────────── */
+function refreshMarquee(){
+  el.titleMarquee.classList.remove('is-scrolling');
+  requestAnimationFrame(() => {
+    if (el.titleMarquee.scrollWidth > el.titleMarquee.clientWidth + 4){
+      el.titleMarquee.classList.add('is-scrolling');
+    }
+  });
+}
+
+/* ── Rendering ────────────────────────────────────────────── */
 function renderTrack({ animate = true } = {}) {
   const t = currentTrack();
-  if (!t) {
-    el.title.textContent = 'No track selected';
-    el.artist.textContent = 'Pick something from the list';
-    return;
-  }
+  if (!t) { el.title.textContent = 'No track selected'; el.artist.textContent = ''; return; }
 
   const paint = () => {
     el.title.textContent = t.title;
@@ -325,44 +331,29 @@ function renderTrack({ animate = true } = {}) {
     el.cover.alt = t.title;
     el.trackDetails.classList.remove('is-fading');
     el.cover.classList.remove('is-fading');
+    refreshMarquee();
   };
 
   if (animate) {
     el.trackDetails.classList.add('is-fading');
     el.cover.classList.add('is-fading');
     setTimeout(paint, 180);
-  } else {
-    paint();
-  }
+  } else paint();
 
-  // playlist/song change → rotate to the next curated backdrop
   applyBackground();
 
   [...el.listItems.children].forEach((row, i) => row.classList.toggle('is-current', i === state.pos));
-  el.listItems.querySelectorAll('.now-badge').forEach((b, i) => (b.textContent = i === state.pos ? '▶ Playing' : ''));
 }
 
 function renderList() {
   el.listItems.innerHTML = '';
-  if (!state.list.length) {
-    el.listItems.innerHTML = `<div class="empty-note">Nothing here yet</div>`;
-    return;
-  }
   state.list.forEach((t, i) => {
     const row = document.createElement('div');
     row.className = 'track-row';
-    row.innerHTML = `
-      <img src="${t.cover}" alt="">
-      <div class="track-meta">
-        <span class="t-title">${t.title}</span>
-        <span class="t-artist">${t.artist}</span>
-      </div>
-      <span class="now-badge"></span>`;
-    row.addEventListener('click', () => playAt(i));
+    row.innerHTML = `<span class="t-title">${t.title}</span><span class="t-artist">${t.artist}</span>`;
+    row.addEventListener('click', () => playAt(state.order.indexOf(i)));
     el.listItems.append(row);
   });
-  el.drawerLabel.textContent = state.tab === 'playlists' ? 'Playlists' : 'Single Songs';
-  el.drawerCount.textContent = `${state.list.length} tracks`;
   el.listCount.textContent = state.list.length;
   renderTrack({ animate: false });
 }
@@ -372,47 +363,41 @@ function renderPlaying(on) {
   el.play.textContent = on ? '⏸' : '▶';
 }
 
-/* ── Tabs ───────────────────────────────────────────────── */
+/* ── Tabs ─────────────────────────────────────────────────── */
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     state.tab = btn.dataset.tab;
     state.list = state.tab === 'playlists' ? PLAYLISTS : SINGLES;
+    state.order = buildOrder();
     state.pos = 0;
-    state.bgIndex++;
     renderList();
   });
 });
 
-/* ── Drawer toggle ──────────────────────────────────────── */
+/* ── Drawer toggle ────────────────────────────────────────── */
 el.listBtn.addEventListener('click', () => {
   const open = !el.drawer.classList.contains('is-open');
   el.drawer.classList.toggle('is-open', open);
   el.listBtn.classList.toggle('is-on', open);
+  if (open) el.listItems.children[state.pos]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
 });
 
-/* ── Playback ───────────────────────────────────────────── */
-function playAt(i) {
-  state.pos = i;
-  state.bgIndex++;
+/* ── Playback ─────────────────────────────────────────────── */
+function playAt(orderPos) {
+  const n = state.order.length;
+  state.pos = ((orderPos % n) + n) % n;
   renderTrack();
   if (!yt || !state.ready) return;
   yt.loadVideoById(currentTrack().id);
   yt.playVideo();
 }
-
 function toggle() {
   if (!yt || !state.ready) return;
-  if (state.playing) yt.pauseVideo();
-  else yt.playVideo();
+  state.playing ? yt.pauseVideo() : yt.playVideo();
 }
-
-function go(delta) {
-  const n = state.list.length;
-  if (!n) return;
-  playAt(((state.pos + delta) % n + n) % n);
-}
+function go(delta) { if (state.order.length) playAt(state.pos + delta); }
 
 el.play.addEventListener('click', toggle);
 el.prev.addEventListener('click', () => {
@@ -421,7 +406,41 @@ el.prev.addEventListener('click', () => {
 });
 el.next.addEventListener('click', () => go(1));
 
-/* ── Seek bar ───────────────────────────────────────────── */
+el.shuffleBtn.addEventListener('click', () => {
+  const keepTrackIdx = state.order[state.pos];
+  state.shuffleOn = !state.shuffleOn;
+  el.shuffleBtn.classList.toggle('is-on', state.shuffleOn);
+  state.order = state.shuffleOn ? shuffleArr(buildOrder()) : buildOrder();
+  state.pos = Math.max(0, state.order.indexOf(keepTrackIdx));
+  renderTrack({ animate: false });
+});
+
+el.repeatBtn.addEventListener('click', () => {
+  state.repeatOn = !state.repeatOn;
+  el.repeatBtn.classList.toggle('is-on', state.repeatOn);
+});
+
+/* ── Fully Working Dark Mode Toggle ──────────────────────── */
+el.nightBtn.addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark-mode');
+  el.nightBtn.classList.toggle('is-on', isDark);
+  el.nightBtn.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+});
+
+// Load saved dark mode preference
+if (localStorage.getItem('darkMode') === 'enabled') {
+  document.body.classList.add('dark-mode');
+  el.nightBtn.classList.add('is-on');
+  el.nightBtn.textContent = '☀️';
+}
+
+el.ytBtn.addEventListener('click', () => {
+  const t = currentTrack();
+  if (t) window.open(`https://www.youtube.com/watch?v=${t.id}`, '_blank');
+});
+
+/* ── Seek bar ─────────────────────────────────────────────── */
 function fractionFromEvent(e) {
   const r = el.seek.getBoundingClientRect();
   const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
@@ -433,9 +452,7 @@ el.seek.addEventListener('pointerdown', e => {
   el.seek.setPointerCapture(e.pointerId);
   el.seekFill.style.width = `${fractionFromEvent(e) * 100}%`;
 });
-el.seek.addEventListener('pointermove', e => {
-  if (state.scrubbing) el.seekFill.style.width = `${fractionFromEvent(e) * 100}%`;
-});
+el.seek.addEventListener('pointermove', e => { if (state.scrubbing) el.seekFill.style.width = `${fractionFromEvent(e) * 100}%`; });
 el.seek.addEventListener('pointerup', e => {
   if (!state.scrubbing) return;
   state.scrubbing = false;
@@ -443,23 +460,42 @@ el.seek.addEventListener('pointerup', e => {
   if (dur) yt.seekTo(dur * fractionFromEvent(e), true);
 });
 
-/* ── Progress polling ───────────────────────────────────── */
+/* ── Progress polling ─────────────────────────────────────── */
 setInterval(() => {
   if (!yt || state.scrubbing || typeof yt.getCurrentTime !== 'function') return;
   const cur = yt.getCurrentTime() || 0;
   const dur = yt.getDuration() || 0;
-  if (dur) {
-    el.seekFill.style.width = `${Math.min(100, (cur / dur) * 100)}%`;
-    el.tDur.textContent = fmt(dur);
-  }
+  if (dur) { el.seekFill.style.width = `${Math.min(100, (cur / dur) * 100)}%`; el.tDur.textContent = fmt(dur); }
   el.tCur.textContent = fmt(cur);
 }, 500);
 
-/* ── YouTube IFrame API boot ────────────────────────────── */
+/* ── Clock ────────────────────────────────────────────────── */
+function tickClock(){
+  el.clock.textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+}
+tickClock();
+setInterval(tickClock, 15000);
+
+/* ── Live listener count ─────────────────────────────────── */
+(function driftListeners(){
+  const MIN = 27, MAX = 35;
+  let count = MIN + Math.floor(Math.random() * (MAX - MIN));
+  el.liveCount.textContent = count;
+  const step = () => {
+    const mid = (MIN + MAX) / 2;
+    const up = Math.random() < (count < mid ? 0.6 : 0.4);
+    count = Math.max(MIN, Math.min(MAX, count + (up ? 1 : -1)));
+    el.liveCount.textContent = count;
+    setTimeout(step, 3000 + Math.random() * 4000);
+  };
+  setTimeout(step, 2500);
+})();
+
+/* ── YouTube IFrame API boot ──────────────────────────────── */
 window.onYouTubeIframeAPIReady = () => {
   yt = new YT.Player('yt-player', {
     height: '1', width: '1',
-    videoId: currentTrack().id,
+    videoId: 'NlWmLCZM7gA',
     playerVars: { playsinline: 1, controls: 0, disablekb: 1, modestbranding: 1, rel: 0 },
     events: {
       onReady: () => { state.ready = true; el.play.disabled = false; },
@@ -467,15 +503,16 @@ window.onYouTubeIframeAPIReady = () => {
         const S = YT.PlayerState;
         if (e.data === S.PLAYING) renderPlaying(true);
         else if (e.data === S.PAUSED) renderPlaying(false);
-        else if (e.data === S.ENDED) go(1);
+        else if (e.data === S.ENDED) state.repeatOn ? playAt(state.pos) : go(1);
       },
-      onError: () => go(1), // skip dead / region-blocked videos
+      onError: () => go(1),
     },
   });
 };
 
-/* ── Init ───────────────────────────────────────────────── */
-renderList();
+/* ── Init ─────────────────────────────────────────────────── */
+loadTrackData();
+window.addEventListener('resize', refreshMarquee);
 </script>
 
 <script src="https://www.youtube.com/iframe_api"></script>
